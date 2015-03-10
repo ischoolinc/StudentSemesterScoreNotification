@@ -48,6 +48,16 @@ namespace StudentSemesterScoreNotification
             foreach (string s in _sourceList)
                 colSource.Items.Add(s);
 
+            //設定排序
+            _setting.Sort(delegate(AbsentSetting x, AbsentSetting y)
+            {
+                string xx = x.Target.PadLeft(20, '0');
+                xx += x.Source.PadLeft(20, '0');
+                string yy = y.Target.PadLeft(20, '0');
+                yy += y.Source.PadLeft(20, '0');
+                return xx.CompareTo(yy);
+            });
+
             //讀回設定
             foreach (AbsentSetting abs in _setting)
             {
