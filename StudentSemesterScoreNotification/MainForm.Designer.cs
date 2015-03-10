@@ -34,8 +34,8 @@
             this.cboSchoolYear = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.cboSemester = new DevComponents.DotNetBar.Controls.ComboBoxEx();
             this.btnClose = new DevComponents.DotNetBar.ButtonX();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.lnkPrintSetting = new System.Windows.Forms.LinkLabel();
+            this.lnkAbsentSetting = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // btnConfirm
@@ -116,37 +116,37 @@
             this.btnClose.Text = "離開";
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // linkLabel1
+            // lnkPrintSetting
             // 
-            this.linkLabel1.AutoSize = true;
-            this.linkLabel1.BackColor = System.Drawing.Color.Transparent;
-            this.linkLabel1.Location = new System.Drawing.Point(13, 52);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(60, 17);
-            this.linkLabel1.TabIndex = 6;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "列印設定";
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            this.lnkPrintSetting.AutoSize = true;
+            this.lnkPrintSetting.BackColor = System.Drawing.Color.Transparent;
+            this.lnkPrintSetting.Location = new System.Drawing.Point(13, 52);
+            this.lnkPrintSetting.Name = "lnkPrintSetting";
+            this.lnkPrintSetting.Size = new System.Drawing.Size(60, 17);
+            this.lnkPrintSetting.TabIndex = 6;
+            this.lnkPrintSetting.TabStop = true;
+            this.lnkPrintSetting.Text = "列印設定";
+            this.lnkPrintSetting.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
-            // linkLabel2
+            // lnkAbsentSetting
             // 
-            this.linkLabel2.AutoSize = true;
-            this.linkLabel2.BackColor = System.Drawing.Color.Transparent;
-            this.linkLabel2.Location = new System.Drawing.Point(79, 52);
-            this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(60, 17);
-            this.linkLabel2.TabIndex = 7;
-            this.linkLabel2.TabStop = true;
-            this.linkLabel2.Text = "假別設定";
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
+            this.lnkAbsentSetting.AutoSize = true;
+            this.lnkAbsentSetting.BackColor = System.Drawing.Color.Transparent;
+            this.lnkAbsentSetting.Location = new System.Drawing.Point(79, 52);
+            this.lnkAbsentSetting.Name = "lnkAbsentSetting";
+            this.lnkAbsentSetting.Size = new System.Drawing.Size(60, 17);
+            this.lnkAbsentSetting.TabIndex = 7;
+            this.lnkAbsentSetting.TabStop = true;
+            this.lnkAbsentSetting.Text = "假別設定";
+            this.lnkAbsentSetting.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(373, 85);
-            this.Controls.Add(this.linkLabel2);
-            this.Controls.Add(this.linkLabel1);
+            this.Controls.Add(this.lnkAbsentSetting);
+            this.Controls.Add(this.lnkPrintSetting);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.cboSemester);
             this.Controls.Add(this.cboSchoolYear);
@@ -170,7 +170,7 @@
         private DevComponents.DotNetBar.Controls.ComboBoxEx cboSchoolYear;
         private DevComponents.DotNetBar.Controls.ComboBoxEx cboSemester;
         private DevComponents.DotNetBar.ButtonX btnClose;
-        private System.Windows.Forms.LinkLabel linkLabel1;
-        private System.Windows.Forms.LinkLabel linkLabel2;
+        private System.Windows.Forms.LinkLabel lnkPrintSetting;
+        private System.Windows.Forms.LinkLabel lnkAbsentSetting;
     }
 }

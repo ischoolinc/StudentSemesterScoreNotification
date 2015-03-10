@@ -161,6 +161,8 @@ namespace StudentSemesterScoreNotification
             cboSchoolYear.Enabled = b;
             cboSemester.Enabled = b;
             btnConfirm.Enabled = b;
+            lnkPrintSetting.Enabled = b;
+            lnkAbsentSetting.Enabled = b;
         }
 
     }
