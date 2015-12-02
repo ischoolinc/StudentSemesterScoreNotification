@@ -36,6 +36,7 @@
             this.btnClose = new DevComponents.DotNetBar.ButtonX();
             this.lnkPrintSetting = new System.Windows.Forms.LinkLabel();
             this.lnkAbsentSetting = new System.Windows.Forms.LinkLabel();
+            this.chkReScore = new DevComponents.DotNetBar.Controls.CheckBoxX();
             this.SuspendLayout();
             // 
             // btnConfirm
@@ -43,7 +44,7 @@
             this.btnConfirm.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
             this.btnConfirm.BackColor = System.Drawing.Color.Transparent;
             this.btnConfirm.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.btnConfirm.Location = new System.Drawing.Point(194, 51);
+            this.btnConfirm.Location = new System.Drawing.Point(194, 78);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(75, 23);
             this.btnConfirm.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -108,7 +109,7 @@
             this.btnClose.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
             this.btnClose.BackColor = System.Drawing.Color.Transparent;
             this.btnClose.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.btnClose.Location = new System.Drawing.Point(279, 51);
+            this.btnClose.Location = new System.Drawing.Point(279, 78);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -120,7 +121,7 @@
             // 
             this.lnkPrintSetting.AutoSize = true;
             this.lnkPrintSetting.BackColor = System.Drawing.Color.Transparent;
-            this.lnkPrintSetting.Location = new System.Drawing.Point(13, 52);
+            this.lnkPrintSetting.Location = new System.Drawing.Point(13, 79);
             this.lnkPrintSetting.Name = "lnkPrintSetting";
             this.lnkPrintSetting.Size = new System.Drawing.Size(60, 17);
             this.lnkPrintSetting.TabIndex = 6;
@@ -132,7 +133,7 @@
             // 
             this.lnkAbsentSetting.AutoSize = true;
             this.lnkAbsentSetting.BackColor = System.Drawing.Color.Transparent;
-            this.lnkAbsentSetting.Location = new System.Drawing.Point(79, 52);
+            this.lnkAbsentSetting.Location = new System.Drawing.Point(79, 79);
             this.lnkAbsentSetting.Name = "lnkAbsentSetting";
             this.lnkAbsentSetting.Size = new System.Drawing.Size(60, 17);
             this.lnkAbsentSetting.TabIndex = 7;
@@ -140,11 +141,28 @@
             this.lnkAbsentSetting.Text = "假別設定";
             this.lnkAbsentSetting.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
             // 
+            // chkReScore
+            // 
+            this.chkReScore.AutoSize = true;
+            this.chkReScore.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.chkReScore.BackgroundStyle.Class = "";
+            this.chkReScore.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.chkReScore.Location = new System.Drawing.Point(16, 49);
+            this.chkReScore.Name = "chkReScore";
+            this.chkReScore.Size = new System.Drawing.Size(161, 21);
+            this.chkReScore.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.chkReScore.TabIndex = 8;
+            this.chkReScore.Text = "只產生有補考成績學生";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(373, 85);
+            this.ClientSize = new System.Drawing.Size(373, 113);
+            this.Controls.Add(this.chkReScore);
             this.Controls.Add(this.lnkAbsentSetting);
             this.Controls.Add(this.lnkPrintSetting);
             this.Controls.Add(this.btnClose);
@@ -172,5 +190,6 @@
         private DevComponents.DotNetBar.ButtonX btnClose;
         private System.Windows.Forms.LinkLabel lnkPrintSetting;
         private System.Windows.Forms.LinkLabel lnkAbsentSetting;
+        private DevComponents.DotNetBar.Controls.CheckBoxX chkReScore;
     }
 }

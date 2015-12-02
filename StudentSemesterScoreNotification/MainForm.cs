@@ -22,14 +22,19 @@ namespace StudentSemesterScoreNotification
         private int _schoolYear, _semester;
         private List<StudentRecord> _Students;
 
+        private bool _chkPrintReScore=false;
         private BackgroundWorker _BW;
         private ReportConfiguration _Config;
+        private int _DataRowCount = 0;
+
+        private ReportConfiguration _config;
 
         public MainForm(PrintType type)
         {
             InitializeComponent();
 
             _PrintType = type;
+            _config = new ReportConfiguration(Global.TemplateConfigName);
 
             _BW = new BackgroundWorker();
             _BW.DoWork += new DoWorkEventHandler(BW_DoWork);
@@ -43,6 +48,12 @@ namespace StudentSemesterScoreNotification
             if (e.Error != null)
             {
                 MessageBox.Show(e.Error.Message);
+                return;
+            }
+
+            if(_DataRowCount==0)
+            {
+                MessageBox.Show("沒有資料");
                 return;
             }
 
@@ -89,7 +100,60 @@ namespace StudentSemesterScoreNotification
 
             DataTable dt = DataSource.GetDataTable(_Students, _schoolYear, _semester);
 
-            doc.MailMerge.Execute(dt);
+            _DataRowCount = dt.Rows.Count;
+            // 只顯示補可成績另外處理
+            if(_chkPrintReScore)
+            {
+                DataTable newDt = new DataTable();
+                foreach (DataColumn dc in dt.Columns)
+                    newDt.Columns.Add(dc.ColumnName);
+
+                // 有補考成績 再加入
+                foreach(DataRow dr in dt.Rows)
+                {
+                    bool add = false;
+
+                    // 檢查是否有補考成績
+                    for (int i = 1; i <= Global.SupportSubjectCount;i++ )
+                    {
+                        if (dr["S補考成績"+i] != null)
+                        {
+                            if (dr["S補考成績"+i].ToString().Replace(" ", "").Length > 0)
+                            {
+                                add = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    for (int i = 1; i <= Global.SupportDomainCount;i++)
+                    {
+                        if (dr["D補考成績"+i] != null)
+                        {
+                            if (dr["D補考成績"+i].ToString().Replace(" ", "").Length > 0)
+                            {
+                                add = true;
+                                break;
+                            }                               
+                        }
+                    }
+
+                    if(add)
+                    {
+                        DataRow newDr = newDt.NewRow();
+
+                        foreach (DataColumn dc in dt.Columns)
+                            newDr[dc.ColumnName] = dr[dc.ColumnName];
+
+                        newDt.Rows.Add(newDr);
+                    }
+
+                }
+                doc.MailMerge.Execute(newDt);
+                _DataRowCount = newDt.Rows.Count;
+            }
+            else
+                doc.MailMerge.Execute(dt);
 
             doc.MailMerge.DeleteFields();
 
@@ -98,7 +162,10 @@ namespace StudentSemesterScoreNotification
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            this.MaximumSize = this.MinimumSize = this.Size;
             int schoolYear, semester;
+
+            chkReScore.Checked=_config.GetBoolean("只產生有補考成績學生", true);
 
             _schoolYear = int.TryParse(K12.Data.School.DefaultSchoolYear, out schoolYear) ? schoolYear : 0;
             _semester = int.TryParse(K12.Data.School.DefaultSemester, out semester) ? semester : 0;
@@ -131,6 +198,8 @@ namespace StudentSemesterScoreNotification
 
             _schoolYear = sy;
             _semester = sm;
+            _chkPrintReScore = chkReScore.Checked;
+            _config.SetBoolean("只產生有補考成績學生", chkReScore.Checked);
 
             if (_BW.IsBusy)
                 MessageBox.Show("系統忙碌中,請稍後再試");
