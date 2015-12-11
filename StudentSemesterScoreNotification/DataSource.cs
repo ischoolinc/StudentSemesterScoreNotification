@@ -26,6 +26,11 @@ namespace StudentSemesterScoreNotification
         private static List<StudentRecord> _students;
         private static int _schoolYear, _semester;
 
+        /// <summary>
+        /// 補考成績加註
+        /// </summary>
+        private static string _ReExamMark = "";
+
         //DataRow catch
         private static Dictionary<string, DataRow> _RowCatchs = new Dictionary<string, DataRow>();
 
@@ -56,6 +61,11 @@ namespace StudentSemesterScoreNotification
                     retVal.Add(name);
             }
             return retVal;
+        }
+
+        public static void SetReExamMark(string str)
+        {
+            _ReExamMark = str;
         }
 
         /// <summary>
@@ -213,9 +223,38 @@ namespace StudentSemesterScoreNotification
                 dt.Columns.Add("D補考成績" + i);
             }
 
-            //假別欄位
-            for (int i = 1; i <= Global.SupportAbsentCount; i++)
-                dt.Columns.Add("列印假別" + i);
+            // 指定領域合併
+            foreach (string dName in Global.PriDomainNameList())
+            {
+                dt.Columns.Add(dName + "科目");
+                dt.Columns.Add(dName + "領域");
+                dt.Columns.Add(dName + "節數");
+                dt.Columns.Add(dName + "權數");
+                dt.Columns.Add(dName + "等第");
+                dt.Columns.Add(dName + "成績");
+                dt.Columns.Add(dName + "原始成績");
+                dt.Columns.Add(dName + "補考成績");
+            }
+                       
+            // 只領領域科目合併
+            foreach(string dName in Global.PriDomainNameList())
+            {
+                for(int j=1;j<=7;j++)
+                {
+                    dt.Columns.Add(dName + "科目" + j);
+                    dt.Columns.Add(dName + "領域" + j);
+                    dt.Columns.Add(dName + "節數" + j);
+                    dt.Columns.Add(dName + "權數" + j);
+                    dt.Columns.Add(dName + "等第" + j);
+                    dt.Columns.Add(dName + "成績" + j);
+                    dt.Columns.Add(dName + "原始成績" + j);
+                    dt.Columns.Add(dName + "補考成績" + j);
+                }
+            }
+
+                //假別欄位
+                for (int i = 1; i <= Global.SupportAbsentCount; i++)
+                    dt.Columns.Add("列印假別" + i);
 
             //日常生活表現欄位
             foreach (string key in Global.DLBehaviorRef.Keys)
@@ -363,29 +402,95 @@ namespace StudentSemesterScoreNotification
                 row["課程學習成績"] = jsr.CourseLearnScore.HasValue ? jsr.CourseLearnScore.Value + "" : string.Empty;
                 row["課程學習原始成績"] = jsr.CourseLearnScoreOrigin.HasValue ? jsr.CourseLearnScoreOrigin.Value + "" : string.Empty;
 
+                // 收集領域科目成績給領域科目對照時使用
+                Dictionary<string, DomainScore> DomainScoreDict = new Dictionary<string, DomainScore>();
+                Dictionary<string, List<SubjectScore>> DomainSubjScoreDict = new Dictionary<string, List<SubjectScore>>();
+
                 //科目成績
                 int count = 0;
                 foreach (SubjectScore subj in jsr.Subjects.Values)
                 {
+                    string ssNmae = subj.Domain;
+                    if (string.IsNullOrEmpty(ssNmae))
+                        ssNmae = "彈性課程";
+                    if (!DomainSubjScoreDict.ContainsKey(ssNmae))
+                        DomainSubjScoreDict.Add(ssNmae, new List<SubjectScore>());
+
+                    DomainSubjScoreDict[ssNmae].Add(subj);
+
                     count++;
 
                     //超過就讓它爆炸
                     if (count > Global.SupportSubjectCount)
                         throw new Exception("超過支援列印科目數量: " + Global.SupportSubjectCount);
-
+                                        
                     row["S科目" + count] = subj.Subject;
                     row["S領域" + count] = string.IsNullOrWhiteSpace(subj.Domain) ? "彈性課程" : subj.Domain;
                     row["S節數" + count] = subj.Period + "";
                     row["S權數" + count] = subj.Credit + "";
-                    row["S成績" + count] = subj.Score.HasValue ? subj.Score.Value + "" : string.Empty;
+
+                    string strSScore = "";
+                    if(subj.Score.HasValue)
+                    {
+                        decimal ss = subj.Score.Value;
+                        strSScore = "" + ss;
+
+                        if(subj.ScoreMakeup.HasValue)
+                        {
+                            if (ss == subj.ScoreMakeup.Value)
+                                strSScore = _ReExamMark + ss;
+                        }                            
+                    }
+                    
+                    //row["S成績" + count] = subj.Score.HasValue ? subj.Score.Value + "" : string.Empty;
+                    row["S成績" + count] = strSScore;
                     row["S等第" + count] = subj.Score.HasValue ? _degreeMapper.GetDegreeByScore(subj.Score.Value) : string.Empty;
                     row["S原始成績" + count] = subj.ScoreOrigin.HasValue ? subj.ScoreOrigin.Value + "" : string.Empty;
                     row["S補考成績" + count] = subj.ScoreMakeup.HasValue ? subj.ScoreMakeup.Value + "" : string.Empty;
                 }
 
+                
+                // 處理領域科目並列               
+                foreach(string dName in Global.PriDomainNameList())
+                {                    
+                    if(DomainSubjScoreDict.ContainsKey(dName))
+                    {
+                        int si = 1;
+                        foreach(SubjectScore ss in DomainSubjScoreDict[dName])
+                        {
+                            row[dName + "科目" + si] = ss.Subject;
+                            row[dName + "領域" + si] = ss.Domain;
+                            row[dName + "節數" + si] = ss.Period + "";
+                            row[dName + "權數" + si] = ss.Credit + "";
+
+                            string strSScore = "";
+                            if (ss.Score.HasValue)
+                            {
+                                decimal ssd = ss.Score.Value;
+                                strSScore = "" + ssd;
+
+                                if (ss.ScoreMakeup.HasValue)
+                                {
+                                    if (ssd == ss.ScoreMakeup.Value)
+                                        strSScore = _ReExamMark + ssd;
+                                }
+                            }
+                            row[dName + "等第" + si] = ss.Score.HasValue ? _degreeMapper.GetDegreeByScore(ss.Score.Value) : string.Empty;
+                            row[dName + "成績" + si] = strSScore;
+                            row[dName + "原始成績" + si] = ss.ScoreOrigin.HasValue ? ss.ScoreOrigin.Value + "" : string.Empty;
+                            row[dName + "補考成績" + si] = ss.ScoreMakeup.HasValue ? ss.ScoreMakeup.Value + "" : string.Empty;
+                            si++;
+                        }
+                    }                    
+                }            
+
+
                 count = 0;
                 foreach (DomainScore domain in jsr.Domains.Values)
                 {
+                    if (!DomainScoreDict.ContainsKey(domain.Domain))
+                        DomainScoreDict.Add(domain.Domain, domain);
+
                     count++;
 
                     //超過就讓它爆炸
@@ -395,7 +500,20 @@ namespace StudentSemesterScoreNotification
                     row["D領域" + count] = domain.Domain;
                     row["D節數" + count] = domain.Period + "";
                     row["D權數" + count] = domain.Credit + "";
-                    row["D成績" + count] = domain.Score.HasValue ? domain.Score.Value + "" : string.Empty;
+
+                    string strDScore = "";
+                    if(domain.Score.HasValue)
+                    {
+                        strDScore = domain.Score.Value.ToString();
+                        if(domain.ScoreMakeup.HasValue)
+                        {
+                            if (domain.ScoreMakeup.Value == domain.Score.Value)
+                                strDScore = _ReExamMark + strDScore;
+                        }
+                    }
+                    
+                    //row["D成績" + count] = domain.Score.HasValue ? domain.Score.Value + "" : string.Empty;
+                    row["D成績" + count] = strDScore;
                     row["D等第" + count] = domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
                     row["D原始成績" + count] = domain.ScoreOrigin.HasValue ? domain.ScoreOrigin.Value + "" : string.Empty;
                     row["D補考成績" + count] = domain.ScoreMakeup.HasValue ? domain.ScoreMakeup.Value + "" : string.Empty;
@@ -403,6 +521,37 @@ namespace StudentSemesterScoreNotification
                     if (!string.IsNullOrWhiteSpace(domain.Text))
                         _文字描述.Add(domain.Domain + " : " + domain.Text);
                 }
+
+                // 處理指定領域
+                foreach(string dName in Global.PriDomainNameList())
+                {                    
+                    if(DomainScoreDict.ContainsKey(dName))
+                    {
+                        DomainScore domain = DomainScoreDict[dName];
+                        row[dName + "領域"] = domain.Domain;
+                        row[dName + "節數"] = domain.Period + "";
+                        row[dName + "權數"] = domain.Credit + "";
+
+                        string strDScore = "";
+                        if (domain.Score.HasValue)
+                        {
+                            strDScore = domain.Score.Value.ToString();
+                            if (domain.ScoreMakeup.HasValue)
+                            {
+                                if (domain.ScoreMakeup.Value == domain.Score.Value)
+                                    strDScore = _ReExamMark + strDScore;
+                            }
+                        }
+
+
+                        row[dName + "成績"] = strDScore;
+                        row[dName + "等第"] = domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
+                        row[dName + "原始成績"] = domain.ScoreOrigin.HasValue ? domain.ScoreOrigin.Value + "" : string.Empty;
+                        row[dName + "補考成績"] = domain.ScoreMakeup.HasValue ? domain.ScoreMakeup.Value + "" : string.Empty;
+
+                    }
+                }
+
 
                 row["文字描述"] = string.Join(Environment.NewLine, _文字描述);
             }

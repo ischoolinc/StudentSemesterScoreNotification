@@ -37,6 +37,8 @@
             this.lnkPrintSetting = new System.Windows.Forms.LinkLabel();
             this.lnkAbsentSetting = new System.Windows.Forms.LinkLabel();
             this.chkReScore = new DevComponents.DotNetBar.Controls.CheckBoxX();
+            this.labelX3 = new DevComponents.DotNetBar.LabelX();
+            this.txtReExammark = new DevComponents.DotNetBar.Controls.TextBoxX();
             this.SuspendLayout();
             // 
             // btnConfirm
@@ -44,7 +46,7 @@
             this.btnConfirm.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
             this.btnConfirm.BackColor = System.Drawing.Color.Transparent;
             this.btnConfirm.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.btnConfirm.Location = new System.Drawing.Point(194, 78);
+            this.btnConfirm.Location = new System.Drawing.Point(194, 86);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(75, 23);
             this.btnConfirm.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -109,7 +111,7 @@
             this.btnClose.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
             this.btnClose.BackColor = System.Drawing.Color.Transparent;
             this.btnClose.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.btnClose.Location = new System.Drawing.Point(279, 78);
+            this.btnClose.Location = new System.Drawing.Point(279, 86);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
@@ -121,7 +123,7 @@
             // 
             this.lnkPrintSetting.AutoSize = true;
             this.lnkPrintSetting.BackColor = System.Drawing.Color.Transparent;
-            this.lnkPrintSetting.Location = new System.Drawing.Point(13, 79);
+            this.lnkPrintSetting.Location = new System.Drawing.Point(13, 87);
             this.lnkPrintSetting.Name = "lnkPrintSetting";
             this.lnkPrintSetting.Size = new System.Drawing.Size(60, 17);
             this.lnkPrintSetting.TabIndex = 6;
@@ -133,7 +135,7 @@
             // 
             this.lnkAbsentSetting.AutoSize = true;
             this.lnkAbsentSetting.BackColor = System.Drawing.Color.Transparent;
-            this.lnkAbsentSetting.Location = new System.Drawing.Point(79, 79);
+            this.lnkAbsentSetting.Location = new System.Drawing.Point(79, 87);
             this.lnkAbsentSetting.Name = "lnkAbsentSetting";
             this.lnkAbsentSetting.Size = new System.Drawing.Size(60, 17);
             this.lnkAbsentSetting.TabIndex = 7;
@@ -157,11 +159,41 @@
             this.chkReScore.TabIndex = 8;
             this.chkReScore.Text = "只產生有補考成績學生";
             // 
+            // labelX3
+            // 
+            this.labelX3.AutoSize = true;
+            this.labelX3.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX3.BackgroundStyle.Class = "";
+            this.labelX3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX3.Location = new System.Drawing.Point(194, 49);
+            this.labelX3.Name = "labelX3";
+            this.labelX3.Size = new System.Drawing.Size(87, 21);
+            this.labelX3.TabIndex = 9;
+            this.labelX3.Text = "補考成績加註";
+            // 
+            // txtReExammark
+            // 
+            // 
+            // 
+            // 
+            this.txtReExammark.Border.Class = "TextBoxBorder";
+            this.txtReExammark.Border.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.txtReExammark.Location = new System.Drawing.Point(287, 47);
+            this.txtReExammark.Name = "txtReExammark";
+            this.txtReExammark.Size = new System.Drawing.Size(55, 25);
+            this.txtReExammark.TabIndex = 10;
+            this.txtReExammark.Text = "*";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(373, 113);
+            this.ClientSize = new System.Drawing.Size(373, 123);
+            this.Controls.Add(this.txtReExammark);
+            this.Controls.Add(this.labelX3);
             this.Controls.Add(this.chkReScore);
             this.Controls.Add(this.lnkAbsentSetting);
             this.Controls.Add(this.lnkPrintSetting);
@@ -191,5 +223,7 @@
         private System.Windows.Forms.LinkLabel lnkPrintSetting;
         private System.Windows.Forms.LinkLabel lnkAbsentSetting;
         private DevComponents.DotNetBar.Controls.CheckBoxX chkReScore;
+        private DevComponents.DotNetBar.LabelX labelX3;
+        private DevComponents.DotNetBar.Controls.TextBoxX txtReExammark;
     }
 }

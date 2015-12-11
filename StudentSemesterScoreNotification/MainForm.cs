@@ -29,6 +29,8 @@ namespace StudentSemesterScoreNotification
 
         private ReportConfiguration _config;
 
+        string _ReExamMark = "*";
+
         public MainForm(PrintType type)
         {
             InitializeComponent();
@@ -166,7 +168,7 @@ namespace StudentSemesterScoreNotification
             int schoolYear, semester;
 
             chkReScore.Checked=_config.GetBoolean("只產生有補考成績學生", true);
-
+            txtReExammark.Text = _config.GetString("補考成績加註", "*");
             _schoolYear = int.TryParse(K12.Data.School.DefaultSchoolYear, out schoolYear) ? schoolYear : 0;
             _semester = int.TryParse(K12.Data.School.DefaultSemester, out semester) ? semester : 0;
 
@@ -199,13 +201,15 @@ namespace StudentSemesterScoreNotification
             _schoolYear = sy;
             _semester = sm;
             _chkPrintReScore = chkReScore.Checked;
+            _ReExamMark = txtReExammark.Text;
             _config.SetBoolean("只產生有補考成績學生", chkReScore.Checked);
-
+            _config.SetString("補考成績加註", _ReExamMark);
             if (_BW.IsBusy)
                 MessageBox.Show("系統忙碌中,請稍後再試");
             else
             {
                 SetForm(false);
+                DataSource.SetReExamMark(_ReExamMark);
                 _BW.RunWorkerAsync();
             }
         }
