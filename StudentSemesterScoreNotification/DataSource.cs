@@ -507,7 +507,7 @@ namespace StudentSemesterScoreNotification
                         strDScore = domain.Score.Value.ToString();
                         if(domain.ScoreMakeup.HasValue)
                         {
-                            if (domain.ScoreMakeup.Value == domain.Score.Value)
+                            if (domain.ScoreMakeup.Value >= domain.Score.Value)
                                 strDScore = _ReExamMark + strDScore;
                         }
                     }
@@ -538,7 +538,7 @@ namespace StudentSemesterScoreNotification
                             strDScore = domain.Score.Value.ToString();
                             if (domain.ScoreMakeup.HasValue)
                             {
-                                if (domain.ScoreMakeup.Value == domain.Score.Value)
+                                if (domain.ScoreMakeup.Value >= domain.Score.Value)
                                     strDScore = _ReExamMark + strDScore;
                             }
                         }
