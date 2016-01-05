@@ -31,6 +31,10 @@ namespace StudentSemesterScoreNotification
 
         string _ReExamMark = "*";
 
+        string _SelScoreItem1="原始成績";
+        string _SelScoreItem2 = "補考擇優";
+        string _UserSelScoreItem = "";
+
         public MainForm(PrintType type)
         {
             InitializeComponent();
@@ -167,6 +171,11 @@ namespace StudentSemesterScoreNotification
             this.MaximumSize = this.MinimumSize = this.Size;
             int schoolYear, semester;
 
+            cbxScoreType.Items.Add(_SelScoreItem1);
+            cbxScoreType.Items.Add(_SelScoreItem2);
+            cbxScoreType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxScoreType.Text = _config.GetString("成績類型", _SelScoreItem1);
+
             chkReScore.Checked=_config.GetBoolean("只產生有補考成績學生", true);
             txtReExammark.Text = _config.GetString("補考成績加註", "*");
             _schoolYear = int.TryParse(K12.Data.School.DefaultSchoolYear, out schoolYear) ? schoolYear : 0;
@@ -204,12 +213,15 @@ namespace StudentSemesterScoreNotification
             _ReExamMark = txtReExammark.Text;
             _config.SetBoolean("只產生有補考成績學生", chkReScore.Checked);
             _config.SetString("補考成績加註", _ReExamMark);
+            _config.SetString("成績類型", cbxScoreType.Text);
+            _UserSelScoreItem = cbxScoreType.Text;
             if (_BW.IsBusy)
                 MessageBox.Show("系統忙碌中,請稍後再試");
             else
             {
                 SetForm(false);
                 DataSource.SetReExamMark(_ReExamMark);
+                DataSource.SetUserSelScoreType(_UserSelScoreItem);
                 _BW.RunWorkerAsync();
             }
         }
@@ -236,6 +248,21 @@ namespace StudentSemesterScoreNotification
             btnConfirm.Enabled = b;
             lnkPrintSetting.Enabled = b;
             lnkAbsentSetting.Enabled = b;
+        }
+
+        private void labelX4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void labelX1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void labelX2_Click(object sender, EventArgs e)
+        {
+
         }
 
     }

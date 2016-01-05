@@ -31,6 +31,11 @@ namespace StudentSemesterScoreNotification
         /// </summary>
         private static string _ReExamMark = "";
 
+        /// <summary>
+        /// 使用者選擇成績類別
+        /// </summary>
+        private static string _UserSelScoreType = "";
+
         //DataRow catch
         private static Dictionary<string, DataRow> _RowCatchs = new Dictionary<string, DataRow>();
 
@@ -67,6 +72,12 @@ namespace StudentSemesterScoreNotification
         {
             _ReExamMark = str;
         }
+           
+        public static void SetUserSelScoreType(string str)
+        {
+            _UserSelScoreType = str;
+        }
+
 
         /// <summary>
         /// 取得日常生活表現設定名稱
@@ -295,7 +306,22 @@ namespace StudentSemesterScoreNotification
             //foreach (DataColumn dc in dt.Columns)
             //    dcs.Add(dc.ColumnName);
 
-            return dt;
+            // 加入體適能欄位
+            for (int i = 1; i <= 8;i++ )
+            {
+                dt.Columns.Add("身高" + i);
+                dt.Columns.Add("體重" + i);
+                dt.Columns.Add("坐姿體前彎" + i);
+                dt.Columns.Add("坐姿體前彎常模" + i);
+                dt.Columns.Add("立定跳遠" + i);
+                dt.Columns.Add("立定跳遠常模" + i);
+                dt.Columns.Add("仰臥起坐" + i);
+                dt.Columns.Add("仰臥起坐常模" + i);
+                dt.Columns.Add("心肺適能" + i);
+                dt.Columns.Add("心肺適能常模" + i);
+            }
+
+                return dt;
         }
 
         private static string SelectTime() //取得Server的時間
@@ -397,9 +423,19 @@ namespace StudentSemesterScoreNotification
                 _文字描述.Clear();
 
                 //學習領域成績
-                row["學習領域成績"] = jsr.LearnDomainScore.HasValue ? jsr.LearnDomainScore.Value + "" : string.Empty;
-                row["學習領域原始成績"] = jsr.LearnDomainScoreOrigin.HasValue ? jsr.LearnDomainScoreOrigin.Value + "" : string.Empty;
-                row["課程學習成績"] = jsr.CourseLearnScore.HasValue ? jsr.CourseLearnScore.Value + "" : string.Empty;
+                if(_UserSelScoreType =="原始成績")
+                {
+                    row["學習領域成績"] = jsr.LearnDomainScoreOrigin.HasValue ? jsr.LearnDomainScoreOrigin.Value + "" : string.Empty;
+                    row["課程學習成績"] = jsr.CourseLearnScoreOrigin.HasValue ? jsr.CourseLearnScoreOrigin.Value + "" : string.Empty;
+                }
+                else
+                {
+                    row["學習領域成績"] = jsr.LearnDomainScore.HasValue ? jsr.LearnDomainScore.Value + "" : string.Empty;
+                    row["課程學習成績"] = jsr.CourseLearnScore.HasValue ? jsr.CourseLearnScore.Value + "" : string.Empty;
+                }
+                    
+
+                row["學習領域原始成績"] = jsr.LearnDomainScoreOrigin.HasValue ? jsr.LearnDomainScoreOrigin.Value + "" : string.Empty;                
                 row["課程學習原始成績"] = jsr.CourseLearnScoreOrigin.HasValue ? jsr.CourseLearnScoreOrigin.Value + "" : string.Empty;
 
                 // 收集領域科目成績給領域科目對照時使用
@@ -427,24 +463,10 @@ namespace StudentSemesterScoreNotification
                     row["S科目" + count] = subj.Subject;
                     row["S領域" + count] = string.IsNullOrWhiteSpace(subj.Domain) ? "彈性課程" : subj.Domain;
                     row["S節數" + count] = subj.Period + "";
-                    row["S權數" + count] = subj.Credit + "";
-
-                    string strSScore = "";
-                    if(subj.Score.HasValue)
-                    {
-                        decimal ss = subj.Score.Value;
-                        strSScore = "" + ss;
-
-                        if(subj.ScoreMakeup.HasValue)
-                        {
-                            if (ss == subj.ScoreMakeup.Value)
-                                strSScore = _ReExamMark + ss;
-                        }                            
-                    }
+                    row["S權數" + count] = subj.Credit + "";                   
                     
-                    //row["S成績" + count] = subj.Score.HasValue ? subj.Score.Value + "" : string.Empty;
-                    row["S成績" + count] = strSScore;
-                    row["S等第" + count] = subj.Score.HasValue ? _degreeMapper.GetDegreeByScore(subj.Score.Value) : string.Empty;
+                    row["S成績" + count] = GetScoreString(subj.Score, subj.ScoreOrigin, subj.ScoreMakeup);
+                    row["S等第" + count] = GetScoreDegreeString(subj.Score, subj.ScoreOrigin, subj.ScoreMakeup);//subj.Score.HasValue ? _degreeMapper.GetDegreeByScore(subj.Score.Value) : string.Empty;
                     row["S原始成績" + count] = subj.ScoreOrigin.HasValue ? subj.ScoreOrigin.Value + "" : string.Empty;
                     row["S補考成績" + count] = subj.ScoreMakeup.HasValue ? subj.ScoreMakeup.Value + "" : string.Empty;
                 }
@@ -463,20 +485,8 @@ namespace StudentSemesterScoreNotification
                             row[dName + "節數" + si] = ss.Period + "";
                             row[dName + "權數" + si] = ss.Credit + "";
 
-                            string strSScore = "";
-                            if (ss.Score.HasValue)
-                            {
-                                decimal ssd = ss.Score.Value;
-                                strSScore = "" + ssd;
-
-                                if (ss.ScoreMakeup.HasValue)
-                                {
-                                    if (ssd == ss.ScoreMakeup.Value)
-                                        strSScore = _ReExamMark + ssd;
-                                }
-                            }
-                            row[dName + "等第" + si] = ss.Score.HasValue ? _degreeMapper.GetDegreeByScore(ss.Score.Value) : string.Empty;
-                            row[dName + "成績" + si] = strSScore;
+                            row[dName + "等第" + si] = GetScoreDegreeString(ss.Score, ss.ScoreOrigin, ss.ScoreMakeup);//ss.Score.HasValue ? _degreeMapper.GetDegreeByScore(ss.Score.Value) : string.Empty;
+                            row[dName + "成績" + si] = GetScoreString(ss.Score, ss.ScoreOrigin, ss.ScoreMakeup);
                             row[dName + "原始成績" + si] = ss.ScoreOrigin.HasValue ? ss.ScoreOrigin.Value + "" : string.Empty;
                             row[dName + "補考成績" + si] = ss.ScoreMakeup.HasValue ? ss.ScoreMakeup.Value + "" : string.Empty;
                             si++;
@@ -500,21 +510,10 @@ namespace StudentSemesterScoreNotification
                     row["D領域" + count] = domain.Domain;
                     row["D節數" + count] = domain.Period + "";
                     row["D權數" + count] = domain.Credit + "";
-
-                    string strDScore = "";
-                    if(domain.Score.HasValue)
-                    {
-                        strDScore = domain.Score.Value.ToString();
-                        if(domain.ScoreMakeup.HasValue)
-                        {
-                            if (domain.ScoreMakeup.Value >= domain.Score.Value)
-                                strDScore = _ReExamMark + strDScore;
-                        }
-                    }
                     
                     //row["D成績" + count] = domain.Score.HasValue ? domain.Score.Value + "" : string.Empty;
-                    row["D成績" + count] = strDScore;
-                    row["D等第" + count] = domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
+                    row["D成績" + count] = GetScoreString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup);
+                    row["D等第" + count] = GetScoreDegreeString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup);//domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
                     row["D原始成績" + count] = domain.ScoreOrigin.HasValue ? domain.ScoreOrigin.Value + "" : string.Empty;
                     row["D補考成績" + count] = domain.ScoreMakeup.HasValue ? domain.ScoreMakeup.Value + "" : string.Empty;
 
@@ -532,23 +531,10 @@ namespace StudentSemesterScoreNotification
                         row[dName + "節數"] = domain.Period + "";
                         row[dName + "權數"] = domain.Credit + "";
 
-                        string strDScore = "";
-                        if (domain.Score.HasValue)
-                        {
-                            strDScore = domain.Score.Value.ToString();
-                            if (domain.ScoreMakeup.HasValue)
-                            {
-                                if (domain.ScoreMakeup.Value >= domain.Score.Value)
-                                    strDScore = _ReExamMark + strDScore;
-                            }
-                        }
-
-
-                        row[dName + "成績"] = strDScore;
-                        row[dName + "等第"] = domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
+                        row[dName + "成績"] = GetScoreString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup);
+                        row[dName + "等第"] = GetScoreDegreeString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup);//domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
                         row[dName + "原始成績"] = domain.ScoreOrigin.HasValue ? domain.ScoreOrigin.Value + "" : string.Empty;
                         row[dName + "補考成績"] = domain.ScoreMakeup.HasValue ? domain.ScoreMakeup.Value + "" : string.Empty;
-
                     }
                 }
 
@@ -654,7 +640,128 @@ namespace StudentSemesterScoreNotification
                 decimal hr = old_hr + new_hr;
                 row["服務學習時數"] = hr;
             }
+
+            // 取得體適能資料
+            Dictionary<string, List<StudentFitnessRecord_C>> StudentFitnessRecord_CDict = new Dictionary<string, List<StudentFitnessRecord_C>>();
+
+            string qry = "ref_student_id in('" + string.Join("','", studentIDs.ToArray()) + "') and school_year=" + _schoolYear;
+            AccessHelper accHelper = new AccessHelper();
+            List<StudentFitnessRecord_C> StudentFitnessRecord_CList = accHelper.Select<StudentFitnessRecord_C>(qry);
+
+            // 依測驗日期排序
+            StudentFitnessRecord_CList = (from data in StudentFitnessRecord_CList orderby data.TestDate ascending select data).ToList();
+
+            foreach (StudentFitnessRecord_C rec in StudentFitnessRecord_CList)
+            {
+                if (!StudentFitnessRecord_CDict.ContainsKey(rec.StudentID))
+                    StudentFitnessRecord_CDict.Add(rec.StudentID, new List<StudentFitnessRecord_C>());
+
+                StudentFitnessRecord_CDict[rec.StudentID].Add(rec);
+            }
+
+            foreach(string sid in StudentFitnessRecord_CDict.Keys)
+            {
+                if (_RowCatchs.ContainsKey(sid))
+                {
+                    DataRow row = _RowCatchs[sid];
+                    int cot = 1;
+                    foreach(StudentFitnessRecord_C rec in StudentFitnessRecord_CDict[sid])
+                    {
+                        row["身高" + cot] = rec.Height;
+                        row["體重" + cot] = rec.Weight;
+                        row["坐姿體前彎" + cot] = rec.SitAndReach;
+                        row["坐姿體前彎常模" + cot] = rec.SitAndReachDegree;
+                        row["立定跳遠" + cot] = rec.StandingLongJump;
+                        row["立定跳遠常模" + cot] = rec.StandingLongJumpDegree;
+                        row["仰臥起坐" + cot] = rec.SitUp;
+                        row["仰臥起坐常模" + cot] = rec.SitUpDegree;
+                        row["心肺適能" + cot] = rec.Cardiorespiratory;
+                        row["心肺適能常模" + cot] = rec.CardiorespiratoryDegree;
+                        cot++;
+                    }
+                }
+            }
         }
+
+
+        /// <summary>
+        /// 取得成績文字型態
+        /// </summary>
+        /// <param name="score"></param>
+        /// <param name="scoreO"></param>
+        /// <param name="scoreM"></param>
+        /// <returns></returns>
+        private static string GetScoreString(decimal? score, decimal? scoreO, decimal? scoreM)
+        {
+            string value = "";
+
+            if (_UserSelScoreType == "原始成績")
+            {
+                if (scoreO.HasValue)
+                    value = scoreO.Value.ToString();
+            }
+
+            if (_UserSelScoreType == "補考擇優")
+            {
+                decimal ss=0;
+                // 成績
+                if (score.HasValue)
+                    ss = score.Value;
+
+                // 原始
+                if (scoreO.HasValue && scoreO.Value > ss)
+                    ss = scoreO.Value;
+
+                // 補考
+                if (scoreM.HasValue && scoreM.Value > ss)
+                    ss = scoreM.Value;
+
+                if (scoreM.HasValue && scoreM.Value >= ss)
+                    value = _ReExamMark + ss;
+                else
+                    value = ss.ToString();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// 取得成績等第
+        /// </summary>
+        /// <param name="score"></param>
+        /// <param name="scoreO"></param>
+        /// <param name="scoreM"></param>
+        /// <returns></returns>
+        private static string GetScoreDegreeString(decimal? score, decimal? scoreO, decimal? scoreM)
+        {
+            string value = "";
+
+            if(_UserSelScoreType=="原始成績")
+            {
+                if(scoreO.HasValue)
+                {
+                    value = _degreeMapper.GetDegreeByScore(scoreO.Value);
+                }
+            }
+
+            if(_UserSelScoreType =="補考擇優")
+            {
+                decimal ss = 0;
+                if (score.HasValue)
+                    ss = score.Value;
+
+                if (scoreO.HasValue && scoreO.Value > ss)
+                    ss = scoreO.Value;
+
+                if (scoreM.HasValue && scoreM.Value > ss)
+                    ss = scoreM.Value;
+
+                value = _degreeMapper.GetDegreeByScore(ss);
+            }
+
+            return value;
+        }
+
 
         /// <summary>
         /// 填寫日常生活表現資料
@@ -663,6 +770,7 @@ namespace StudentSemesterScoreNotification
         /// <param name="path"></param>
         /// <param name="textScore"></param>
         /// <param name="row"></param>
+
         private static void SetDLBehaviorData(string name, string path, XmlElement textScore, DataRow row)
         {
             row[name + "_Name"] = _DLBehaviorConfigNameDict.ContainsKey(name) ? _DLBehaviorConfigNameDict[name] : string.Empty;

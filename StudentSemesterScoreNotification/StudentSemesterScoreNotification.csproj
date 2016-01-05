@@ -128,6 +128,7 @@
     <Compile Include="SelectTypeForm.Designer.cs">
       <DependentUpon>SelectTypeForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="StudentFitnessRecord_C.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MainForm.resx">
@@ -147,6 +148,24 @@
   <ItemGroup>
     <None Include="Resources\MergeFields.doc" />
     <None Include="Resources\Template.doc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Library\Aspose.Words_201402.dll" />
+    <Content Include="Library\Campus.Report.dll" />
+    <Content Include="Library\DevComponents.DotNetBar2.dll" />
+    <Content Include="Library\FISCA.Data.dll" />
+    <Content Include="Library\FISCA.Data.pdb" />
+    <Content Include="Library\FISCA.Data.xml" />
+    <Content Include="Library\FISCA.dll" />
+    <Content Include="Library\FISCA.Permission.dll" />
+    <Content Include="Library\FISCA.Presentation.dll" />
+    <Content Include="Library\FISCA.UDT.dll" />
+    <Content Include="Library\Framework.dll" />
+    <Content Include="Library\JHSchool.Behavior.dll" />
+    <Content Include="Library\JHSchool.Data.dll" />
+    <Content Include="Library\JHSchool.Evaluation.dll" />
+    <Content Include="Library\K12.Data.dll" />
+    <Content Include="Library\K12.Presentation.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
