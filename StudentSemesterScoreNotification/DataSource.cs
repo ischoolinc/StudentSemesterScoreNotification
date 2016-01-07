@@ -701,7 +701,7 @@ namespace StudentSemesterScoreNotification
                     value = scoreO.Value.ToString();
             }
 
-            if (_UserSelScoreType == "補考擇優")
+            if (_UserSelScoreType == "原始補考擇優")
             {
                 decimal ss=0;
                 // 成績
@@ -744,7 +744,7 @@ namespace StudentSemesterScoreNotification
                 }
             }
 
-            if(_UserSelScoreType =="補考擇優")
+            if(_UserSelScoreType =="原始補考擇優")
             {
                 decimal ss = 0;
                 if (score.HasValue)

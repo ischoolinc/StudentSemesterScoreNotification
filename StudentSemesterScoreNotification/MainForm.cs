@@ -32,7 +32,7 @@ namespace StudentSemesterScoreNotification
         string _ReExamMark = "*";
 
         string _SelScoreItem1="原始成績";
-        string _SelScoreItem2 = "補考擇優";
+        string _SelScoreItem2 = "原始補考擇優";
         string _UserSelScoreItem = "";
 
         public MainForm(PrintType type)
