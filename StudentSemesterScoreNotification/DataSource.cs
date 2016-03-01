@@ -464,8 +464,8 @@ namespace StudentSemesterScoreNotification
                     row["S領域" + count] = string.IsNullOrWhiteSpace(subj.Domain) ? "彈性課程" : subj.Domain;
                     row["S節數" + count] = subj.Period + "";
                     row["S權數" + count] = subj.Credit + "";
-                    row["S成績" + count] = GetScoreString(subj.Score, subj.ScoreOrigin, subj.ScoreMakeup,subj.ScoreMakeupLimited);
-                    row["S等第" + count] = GetScoreDegreeString(subj.Score, subj.ScoreOrigin, subj.ScoreMakeup,subj.ScoreMakeupLimited);//subj.Score.HasValue ? _degreeMapper.GetDegreeByScore(subj.Score.Value) : string.Empty;
+                    row["S成績" + count] = GetScoreString(subj.Score, subj.ScoreOrigin, subj.ScoreMakeup);
+                    row["S等第" + count] = GetScoreDegreeString(subj.Score, subj.ScoreOrigin);//subj.Score.HasValue ? _degreeMapper.GetDegreeByScore(subj.Score.Value) : string.Empty;
                     row["S原始成績" + count] = subj.ScoreOrigin.HasValue ? subj.ScoreOrigin.Value + "" : string.Empty;
                     row["S補考成績" + count] = subj.ScoreMakeup.HasValue ? subj.ScoreMakeup.Value + "" : string.Empty;
                 }
@@ -484,8 +484,8 @@ namespace StudentSemesterScoreNotification
                             row[dName + "節數" + si] = ss.Period + "";
                             row[dName + "權數" + si] = ss.Credit + "";                           
 
-                            row[dName + "等第" + si] = GetScoreDegreeString(ss.Score, ss.ScoreOrigin, ss.ScoreMakeup,ss.ScoreMakeupLimited);//ss.Score.HasValue ? _degreeMapper.GetDegreeByScore(ss.Score.Value) : string.Empty;
-                            row[dName + "成績" + si] = GetScoreString(ss.Score, ss.ScoreOrigin, ss.ScoreMakeup,ss.ScoreMakeupLimited);
+                            row[dName + "等第" + si] = GetScoreDegreeString(ss.Score, ss.ScoreOrigin);//ss.Score.HasValue ? _degreeMapper.GetDegreeByScore(ss.Score.Value) : string.Empty;
+                            row[dName + "成績" + si] = GetScoreString(ss.Score, ss.ScoreOrigin, ss.ScoreMakeup);
                             row[dName + "原始成績" + si] = ss.ScoreOrigin.HasValue ? ss.ScoreOrigin.Value + "" : string.Empty;
                             row[dName + "補考成績" + si] = ss.ScoreMakeup.HasValue ? ss.ScoreMakeup.Value + "" : string.Empty;
                             si++;
@@ -511,9 +511,9 @@ namespace StudentSemesterScoreNotification
                     row["D權數" + count] = domain.Credit + "";
                     
                     //row["D成績" + count] = domain.Score.HasValue ? domain.Score.Value + "" : string.Empty;
-                    row["D成績" + count] = GetScoreString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup,domain.ScoreMakeupLimited);
+                    row["D成績" + count] = GetScoreString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup);
                     
-                    row["D等第" + count] = GetScoreDegreeString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup,domain.ScoreMakeupLimited);//domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
+                    row["D等第" + count] = GetScoreDegreeString(domain.Score, domain.ScoreOrigin);//domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
                     row["D原始成績" + count] = domain.ScoreOrigin.HasValue ? domain.ScoreOrigin.Value + "" : string.Empty;
                     row["D補考成績" + count] = domain.ScoreMakeup.HasValue ? domain.ScoreMakeup.Value + "" : string.Empty;
 
@@ -530,8 +530,8 @@ namespace StudentSemesterScoreNotification
                         row[dName + "領域"] = domain.Domain;
                         row[dName + "節數"] = domain.Period + "";
                         row[dName + "權數"] = domain.Credit + "";                        
-                        row[dName + "成績"] = GetScoreString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup,domain.ScoreMakeupLimited);
-                        row[dName + "等第"] = GetScoreDegreeString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup,domain.ScoreMakeupLimited);//domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
+                        row[dName + "成績"] = GetScoreString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup);
+                        row[dName + "等第"] = GetScoreDegreeString(domain.Score, domain.ScoreOrigin);//domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
                         row[dName + "原始成績"] = domain.ScoreOrigin.HasValue ? domain.ScoreOrigin.Value + "" : string.Empty;
                         row[dName + "補考成績"] = domain.ScoreMakeup.HasValue ? domain.ScoreMakeup.Value + "" : string.Empty;
                     }
@@ -690,7 +690,7 @@ namespace StudentSemesterScoreNotification
         /// <param name="scoreO"></param>
         /// <param name="scoreM"></param>
         /// <returns></returns>
-        private static string GetScoreString(decimal? score, decimal? scoreO, decimal? scoreM,decimal? scoreML)
+        private static string GetScoreString(decimal? score, decimal? scoreO, decimal? scoreM)
         {
             string value = "";
 
@@ -706,21 +706,7 @@ namespace StudentSemesterScoreNotification
                 // 成績
                 if (score.HasValue)
                     ss = score.Value;
-
-                // 原始
-                if (scoreO.HasValue && scoreO.Value > ss)
-                    ss = scoreO.Value;
-
-                // 補考
-                if (scoreM.HasValue && scoreM.Value > ss)
-                {
-                    ss = scoreM.Value;
-
-                    // 檢查捕考成績限制
-                    if(scoreML.HasValue)
-                        if (ss > scoreML.Value)
-                            ss = scoreML.Value;
-                }
+          
                 if (scoreM.HasValue && scoreM.Value >= ss)
                     value = _ReExamMark + ss;
                 else
@@ -737,7 +723,7 @@ namespace StudentSemesterScoreNotification
         /// <param name="scoreO"></param>
         /// <param name="scoreM"></param>
         /// <returns></returns>
-        private static string GetScoreDegreeString(decimal? score, decimal? scoreO, decimal? scoreM,decimal? scoreML)
+        private static string GetScoreDegreeString(decimal? score, decimal? scoreO)
         {
             string value = "";
 
@@ -754,19 +740,7 @@ namespace StudentSemesterScoreNotification
                 decimal ss = 0;
                 if (score.HasValue)
                     ss = score.Value;
-
-                if (scoreO.HasValue && scoreO.Value > ss)
-                    ss = scoreO.Value;
-
-                if (scoreM.HasValue && scoreM.Value > ss)
-                {
-                    ss = scoreM.Value;
-
-                    // 補考限制
-                    if (scoreML.HasValue)
-                        if (ss > scoreML.Value)
-                            ss = scoreML.Value;
-                }
+              
                 value = _degreeMapper.GetDegreeByScore(ss);
             }
 
