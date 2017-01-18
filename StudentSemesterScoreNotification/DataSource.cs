@@ -72,7 +72,7 @@ namespace StudentSemesterScoreNotification
         {
             _ReExamMark = str;
         }
-           
+
         public static void SetUserSelScoreType(string str)
         {
             _UserSelScoreType = str;
@@ -246,11 +246,11 @@ namespace StudentSemesterScoreNotification
                 dt.Columns.Add(dName + "原始成績");
                 dt.Columns.Add(dName + "補考成績");
             }
-                       
+
             // 只領領域科目合併
-            foreach(string dName in Global.PriDomainNameList())
+            foreach (string dName in Global.PriDomainNameList())
             {
-                for(int j=1;j<=7;j++)
+                for (int j = 1; j <= 7; j++)
                 {
                     dt.Columns.Add(dName + "科目" + j);
                     dt.Columns.Add(dName + "領域" + j);
@@ -263,9 +263,9 @@ namespace StudentSemesterScoreNotification
                 }
             }
 
-                //假別欄位
-                for (int i = 1; i <= Global.SupportAbsentCount; i++)
-                    dt.Columns.Add("列印假別" + i);
+            //假別欄位
+            for (int i = 1; i <= Global.SupportAbsentCount; i++)
+                dt.Columns.Add("列印假別" + i);
 
             //日常生活表現欄位
             foreach (string key in Global.DLBehaviorRef.Keys)
@@ -307,7 +307,7 @@ namespace StudentSemesterScoreNotification
             //    dcs.Add(dc.ColumnName);
 
             // 加入體適能欄位
-            for (int i = 1; i <= 8;i++ )
+            for (int i = 1; i <= 8; i++)
             {
                 dt.Columns.Add("身高" + i);
                 dt.Columns.Add("體重" + i);
@@ -321,7 +321,7 @@ namespace StudentSemesterScoreNotification
                 dt.Columns.Add("心肺適能常模" + i);
             }
 
-                return dt;
+            return dt;
         }
 
         private static string SelectTime() //取得Server的時間
@@ -423,7 +423,7 @@ namespace StudentSemesterScoreNotification
                 _文字描述.Clear();
 
                 //學習領域成績
-                if(_UserSelScoreType =="原始成績")
+                if (_UserSelScoreType == "原始成績")
                 {
                     row["學習領域成績"] = jsr.LearnDomainScoreOrigin.HasValue ? jsr.LearnDomainScoreOrigin.Value + "" : string.Empty;
                     row["課程學習成績"] = jsr.CourseLearnScoreOrigin.HasValue ? jsr.CourseLearnScoreOrigin.Value + "" : string.Empty;
@@ -433,18 +433,55 @@ namespace StudentSemesterScoreNotification
                     row["學習領域成績"] = jsr.LearnDomainScore.HasValue ? jsr.LearnDomainScore.Value + "" : string.Empty;
                     row["課程學習成績"] = jsr.CourseLearnScore.HasValue ? jsr.CourseLearnScore.Value + "" : string.Empty;
                 }
-                    
 
-                row["學習領域原始成績"] = jsr.LearnDomainScoreOrigin.HasValue ? jsr.LearnDomainScoreOrigin.Value + "" : string.Empty;                
+
+                row["學習領域原始成績"] = jsr.LearnDomainScoreOrigin.HasValue ? jsr.LearnDomainScoreOrigin.Value + "" : string.Empty;
                 row["課程學習原始成績"] = jsr.CourseLearnScoreOrigin.HasValue ? jsr.CourseLearnScoreOrigin.Value + "" : string.Empty;
 
                 // 收集領域科目成績給領域科目對照時使用
                 Dictionary<string, DomainScore> DomainScoreDict = new Dictionary<string, DomainScore>();
                 Dictionary<string, List<SubjectScore>> DomainSubjScoreDict = new Dictionary<string, List<SubjectScore>>();
 
+
+
+
+                #region 科目成績照領域排序
+                var jsSubjects = new List<SubjectScore>(jsr.Subjects.Values);
+                var domainList = new Dictionary<string, int>();
+                domainList.Add("語文", 9000);
+                domainList.Add("國語文", 8000);
+                domainList.Add("英語", 7000);
+                domainList.Add("數學", 6000);
+                domainList.Add("社會", 5000);
+                domainList.Add("自然與生活科技", 4000);
+                domainList.Add("藝術與人文", 3000);
+                domainList.Add("健康與體育", 2000);
+                domainList.Add("綜合活動", 1000);
+                domainList.Add("彈性課程", 0900);
+                jsSubjects.Sort(delegate (SubjectScore r1, SubjectScore r2)
+                {
+                    decimal rank1 = 0;
+                    decimal rank2 = 0;
+
+                    if (r1.Credit != null)
+                        rank1 += r1.Credit.Value;
+                    if (r2.Credit != null)
+                        rank2 += r2.Credit.Value;
+
+                    if (domainList.ContainsKey(r1.Domain))
+                        rank1 += domainList[r1.Domain];
+                    if (domainList.ContainsKey(r2.Domain))
+                        rank2 += domainList[r2.Domain];
+
+                    if (rank1 == rank2)
+                        return r2.Subject.CompareTo(r1.Subject);
+                    else
+                        return rank2.CompareTo(rank1);
+                });
+                #endregion
                 //科目成績
                 int count = 0;
-                foreach (SubjectScore subj in jsr.Subjects.Values)
+                foreach (SubjectScore subj in jsSubjects)
                 {
                     string ssNmae = subj.Domain;
                     if (string.IsNullOrEmpty(ssNmae))
@@ -459,7 +496,7 @@ namespace StudentSemesterScoreNotification
                     //超過就讓它爆炸
                     if (count > Global.SupportSubjectCount)
                         throw new Exception("超過支援列印科目數量: " + Global.SupportSubjectCount);
-                                        
+
                     row["S科目" + count] = subj.Subject;
                     row["S領域" + count] = string.IsNullOrWhiteSpace(subj.Domain) ? "彈性課程" : subj.Domain;
                     row["S節數" + count] = subj.Period + "";
@@ -470,19 +507,19 @@ namespace StudentSemesterScoreNotification
                     row["S補考成績" + count] = subj.ScoreMakeup.HasValue ? subj.ScoreMakeup.Value + "" : string.Empty;
                 }
 
-                
+
                 // 處理領域科目並列               
-                foreach(string dName in Global.PriDomainNameList())
-                {                    
-                    if(DomainSubjScoreDict.ContainsKey(dName))
+                foreach (string dName in Global.PriDomainNameList())
+                {
+                    if (DomainSubjScoreDict.ContainsKey(dName))
                     {
                         int si = 1;
-                        foreach(SubjectScore ss in DomainSubjScoreDict[dName])
+                        foreach (SubjectScore ss in DomainSubjScoreDict[dName])
                         {
                             row[dName + "科目" + si] = ss.Subject;
                             row[dName + "領域" + si] = ss.Domain;
                             row[dName + "節數" + si] = ss.Period + "";
-                            row[dName + "權數" + si] = ss.Credit + "";                           
+                            row[dName + "權數" + si] = ss.Credit + "";
 
                             row[dName + "等第" + si] = GetScoreDegreeString(ss.Score, ss.ScoreOrigin);//ss.Score.HasValue ? _degreeMapper.GetDegreeByScore(ss.Score.Value) : string.Empty;
                             row[dName + "成績" + si] = GetScoreString(ss.Score, ss.ScoreOrigin, ss.ScoreMakeup);
@@ -490,8 +527,8 @@ namespace StudentSemesterScoreNotification
                             row[dName + "補考成績" + si] = ss.ScoreMakeup.HasValue ? ss.ScoreMakeup.Value + "" : string.Empty;
                             si++;
                         }
-                    }                    
-                }            
+                    }
+                }
 
 
                 count = 0;
@@ -509,10 +546,10 @@ namespace StudentSemesterScoreNotification
                     row["D領域" + count] = domain.Domain;
                     row["D節數" + count] = domain.Period + "";
                     row["D權數" + count] = domain.Credit + "";
-                    
+
                     //row["D成績" + count] = domain.Score.HasValue ? domain.Score.Value + "" : string.Empty;
                     row["D成績" + count] = GetScoreString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup);
-                    
+
                     row["D等第" + count] = GetScoreDegreeString(domain.Score, domain.ScoreOrigin);//domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
                     row["D原始成績" + count] = domain.ScoreOrigin.HasValue ? domain.ScoreOrigin.Value + "" : string.Empty;
                     row["D補考成績" + count] = domain.ScoreMakeup.HasValue ? domain.ScoreMakeup.Value + "" : string.Empty;
@@ -522,14 +559,14 @@ namespace StudentSemesterScoreNotification
                 }
 
                 // 處理指定領域
-                foreach(string dName in Global.PriDomainNameList())
-                {                    
-                    if(DomainScoreDict.ContainsKey(dName))
+                foreach (string dName in Global.PriDomainNameList())
+                {
+                    if (DomainScoreDict.ContainsKey(dName))
                     {
                         DomainScore domain = DomainScoreDict[dName];
                         row[dName + "領域"] = domain.Domain;
                         row[dName + "節數"] = domain.Period + "";
-                        row[dName + "權數"] = domain.Credit + "";                        
+                        row[dName + "權數"] = domain.Credit + "";
                         row[dName + "成績"] = GetScoreString(domain.Score, domain.ScoreOrigin, domain.ScoreMakeup);
                         row[dName + "等第"] = GetScoreDegreeString(domain.Score, domain.ScoreOrigin);//domain.Score.HasValue ? _degreeMapper.GetDegreeByScore(domain.Score.Value) : string.Empty;
                         row[dName + "原始成績"] = domain.ScoreOrigin.HasValue ? domain.ScoreOrigin.Value + "" : string.Empty;
@@ -658,13 +695,13 @@ namespace StudentSemesterScoreNotification
                 StudentFitnessRecord_CDict[rec.StudentID].Add(rec);
             }
 
-            foreach(string sid in StudentFitnessRecord_CDict.Keys)
+            foreach (string sid in StudentFitnessRecord_CDict.Keys)
             {
                 if (_RowCatchs.ContainsKey(sid))
                 {
                     DataRow row = _RowCatchs[sid];
                     int cot = 1;
-                    foreach(StudentFitnessRecord_C rec in StudentFitnessRecord_CDict[sid])
+                    foreach (StudentFitnessRecord_C rec in StudentFitnessRecord_CDict[sid])
                     {
                         row["身高" + cot] = rec.Height;
                         row["體重" + cot] = rec.Weight;
@@ -702,11 +739,11 @@ namespace StudentSemesterScoreNotification
 
             if (_UserSelScoreType == "原始補考擇優")
             {
-                decimal ss=0;
+                decimal ss = 0;
                 // 成績
                 if (score.HasValue)
                     ss = score.Value;
-          
+
                 if (scoreM.HasValue && scoreM.Value >= ss)
                     value = _ReExamMark + ss;
                 else
@@ -727,20 +764,20 @@ namespace StudentSemesterScoreNotification
         {
             string value = "";
 
-            if(_UserSelScoreType=="原始成績")
+            if (_UserSelScoreType == "原始成績")
             {
-                if(scoreO.HasValue)
+                if (scoreO.HasValue)
                 {
                     value = _degreeMapper.GetDegreeByScore(scoreO.Value);
                 }
             }
 
-            if(_UserSelScoreType =="原始補考擇優")
+            if (_UserSelScoreType == "原始補考擇優")
             {
                 decimal ss = 0;
                 if (score.HasValue)
                     ss = score.Value;
-              
+
                 value = _degreeMapper.GetDegreeByScore(ss);
             }
 
