@@ -17,7 +17,7 @@ namespace StudentSemesterScoreNotification
             FISCA.Presentation.RibbonBarItem item1 = FISCA.Presentation.MotherForm.RibbonBarItems["學生", "資料統計"];
             item1["報表"]["成績相關報表"]["學期成績通知單(含補考成績)"].Enable = false;
             item1["報表"]["成績相關報表"]["學期成績通知單(含補考成績)"].Click += delegate
-            {
+            {             
                 new MainForm(MainForm.PrintType.學生).ShowDialog();
             };
 
@@ -46,6 +46,8 @@ namespace StudentSemesterScoreNotification
             //權限設定
             Catalog permission2 = RoleAclSource.Instance["班級"]["功能按鈕"];
             permission2.Add(new RibbonFeature(Permissions.班級學期成績通知單, "學期成績通知單(含補考成績)"));
+
+
         }
     }
 }

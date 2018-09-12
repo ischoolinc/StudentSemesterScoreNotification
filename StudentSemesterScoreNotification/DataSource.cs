@@ -250,7 +250,7 @@ namespace StudentSemesterScoreNotification
             // 只領領域科目合併
             foreach (string dName in Global.PriDomainNameList())
             {
-                for (int j = 1; j <= 7; j++)
+                for (int j = 1; j <= 10; j++)
                 {
                     dt.Columns.Add(dName + "科目" + j);
                     dt.Columns.Add(dName + "領域" + j);
