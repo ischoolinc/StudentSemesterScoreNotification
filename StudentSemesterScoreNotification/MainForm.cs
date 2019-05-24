@@ -1,4 +1,5 @@
 ﻿using Aspose.Words;
+using Campus.ePaperCloud;
 using Campus.Report;
 using FISCA.Presentation.Controls;
 using K12.Data;
@@ -22,7 +23,7 @@ namespace StudentSemesterScoreNotification
         private int _schoolYear, _semester;
         private List<StudentRecord> _Students;
 
-        private bool _chkPrintReScore=false;
+        private bool _chkPrintReScore = false;
         private BackgroundWorker _BW;
         private ReportConfiguration _Config;
         private int _DataRowCount = 0;
@@ -31,7 +32,7 @@ namespace StudentSemesterScoreNotification
 
         string _ReExamMark = "*";
 
-        string _SelScoreItem1="原始成績";
+        string _SelScoreItem1 = "原始成績";
         string _SelScoreItem2 = "原始補考擇優";
         string _UserSelScoreItem = "";
 
@@ -57,7 +58,7 @@ namespace StudentSemesterScoreNotification
                 return;
             }
 
-            if(_DataRowCount==0)
+            if (_DataRowCount == 0)
             {
                 MessageBox.Show("沒有資料");
                 return;
@@ -65,22 +66,11 @@ namespace StudentSemesterScoreNotification
 
             Document doc = e.Result as Document;
 
-            SaveFileDialog save = new SaveFileDialog();
-            save.Title = "另存新檔";
-            save.FileName = "新版學期成績通知單";
-            save.Filter = "Word檔案 (*.doc)|*.doc|所有檔案 (*.*)|*.*";
-            if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                try
-                {
-                    doc.Save(save.FileName, SaveFormat.Doc);
-                    System.Diagnostics.Process.Start(save.FileName);
-                }
-                catch
-                {
-                    MessageBox.Show("檔案儲存失敗");
-                }
-            }
+            string reportName = _schoolYear + "學年度第" + _semester + "學期學期成績通知單";
+            MemoryStream memoryStream = new MemoryStream();
+            doc.Save(memoryStream, SaveFormat.Docx);
+            ePaperCloud ePaperCloud = new ePaperCloud();
+            ePaperCloud.upload_ePaper(_schoolYear, _semester, reportName, "", memoryStream, ePaperCloud.ViewerType.Student, ePaperCloud.FormatType.Docx);
         }
 
         private void BW_DoWork(object sender, DoWorkEventArgs e)
@@ -108,23 +98,23 @@ namespace StudentSemesterScoreNotification
 
             _DataRowCount = dt.Rows.Count;
             // 只顯示補可成績另外處理
-            if(_chkPrintReScore)
+            if (_chkPrintReScore)
             {
                 DataTable newDt = new DataTable();
                 foreach (DataColumn dc in dt.Columns)
                     newDt.Columns.Add(dc.ColumnName);
 
                 // 有補考成績 再加入
-                foreach(DataRow dr in dt.Rows)
+                foreach (DataRow dr in dt.Rows)
                 {
                     bool add = false;
 
                     // 檢查是否有補考成績
-                    for (int i = 1; i <= Global.SupportSubjectCount;i++ )
+                    for (int i = 1; i <= Global.SupportSubjectCount; i++)
                     {
-                        if (dr["S補考成績"+i] != null)
+                        if (dr["S補考成績" + i] != null)
                         {
-                            if (dr["S補考成績"+i].ToString().Replace(" ", "").Length > 0)
+                            if (dr["S補考成績" + i].ToString().Replace(" ", "").Length > 0)
                             {
                                 add = true;
                                 break;
@@ -132,19 +122,19 @@ namespace StudentSemesterScoreNotification
                         }
                     }
 
-                    for (int i = 1; i <= Global.SupportDomainCount;i++)
+                    for (int i = 1; i <= Global.SupportDomainCount; i++)
                     {
-                        if (dr["D補考成績"+i] != null)
+                        if (dr["D補考成績" + i] != null)
                         {
-                            if (dr["D補考成績"+i].ToString().Replace(" ", "").Length > 0)
+                            if (dr["D補考成績" + i].ToString().Replace(" ", "").Length > 0)
                             {
                                 add = true;
                                 break;
-                            }                               
+                            }
                         }
                     }
 
-                    if(add)
+                    if (add)
                     {
                         DataRow newDr = newDt.NewRow();
 
@@ -176,7 +166,7 @@ namespace StudentSemesterScoreNotification
             cbxScoreType.DropDownStyle = ComboBoxStyle.DropDownList;
             cbxScoreType.Text = _config.GetString("成績類型", _SelScoreItem1);
 
-            chkReScore.Checked=_config.GetBoolean("只產生有補考成績學生", true);
+            chkReScore.Checked = _config.GetBoolean("只產生有補考成績學生", true);
             txtReExammark.Text = _config.GetString("補考成績加註", "*");
             _schoolYear = int.TryParse(K12.Data.School.DefaultSchoolYear, out schoolYear) ? schoolYear : 0;
             _semester = int.TryParse(K12.Data.School.DefaultSemester, out semester) ? semester : 0;
@@ -193,7 +183,7 @@ namespace StudentSemesterScoreNotification
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            int sy,sm;
+            int sy, sm;
 
             if (!int.TryParse(cboSchoolYear.Text, out sy))
             {

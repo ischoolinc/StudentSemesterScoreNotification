@@ -188,6 +188,7 @@ namespace StudentSemesterScoreNotification
             dt.Columns.Add("學校名稱");
             dt.Columns.Add("學年度");
             dt.Columns.Add("學期");
+            dt.Columns.Add("系統編號");
             dt.Columns.Add("姓名");
             dt.Columns.Add("英文姓名");
             dt.Columns.Add("班級");
@@ -385,6 +386,7 @@ namespace StudentSemesterScoreNotification
                 row["學校名稱"] = schoolName;
                 row["學年度"] = _schoolYear;
                 row["學期"] = _semester;
+                row["系統編號"] = "系統編號{" + student.ID + "}";
                 row["姓名"] = student.Name;
                 row["英文姓名"] = student.EnglishName;
                 row["班級"] = myClass.Name + "";
