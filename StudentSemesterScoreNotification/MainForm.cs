@@ -68,7 +68,7 @@ namespace StudentSemesterScoreNotification
 
             string reportName = _schoolYear + "學年度第" + _semester + "學期學期成績通知單";
             MemoryStream memoryStream = new MemoryStream();
-            doc.Save(memoryStream, SaveFormat.Docx);
+            doc.Save(memoryStream, SaveFormat.Doc);
             ePaperCloud ePaperCloud = new ePaperCloud();
             ePaperCloud.upload_ePaper(_schoolYear, _semester, reportName, "", memoryStream, ePaperCloud.ViewerType.Student, ePaperCloud.FormatType.Docx);
         }
