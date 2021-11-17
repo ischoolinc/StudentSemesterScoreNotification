@@ -94,6 +94,9 @@ namespace StudentSemesterScoreNotification
             else
                 _Students = K12.Data.Student.SelectByClassIDs(K12.Presentation.NLDPanels.Class.SelectedSource).FindAll(x => x.Status == StudentRecord.StudentStatus.一般 || x.Status == StudentRecord.StudentStatus.休學);
 
+            //學生資料排序
+            _Students.Sort(new Comparison<StudentRecord>(StudentComparison));
+
             DataTable dt = DataSource.GetDataTable(_Students, _schoolYear, _semester);
 
             _DataRowCount = dt.Rows.Count;
@@ -255,5 +258,30 @@ namespace StudentSemesterScoreNotification
 
         }
 
+        public static int StudentComparison(StudentRecord x, StudentRecord y)
+        {
+            //年級//班級order//班級名稱//座號
+            string yy = "ZZZ";
+            string xx = "ZZZ";
+            if (!(x.RefClassID == "" || x.RefClassID == null))
+            {
+                if (x.Class.DisplayOrder == "" || x.Class.DisplayOrder == null)
+                    xx = x.Class.GradeYear.ToString().PadLeft(3, '0') + ":" + x.Class.DisplayOrder.PadLeft(3, 'Z') + x.Class.Name + ":" + x.SeatNo.ToString().PadLeft(3, '0');
+                else
+                    xx = x.Class.GradeYear.ToString().PadLeft(3, '0') + ":" + x.Class.DisplayOrder.PadLeft(3, '0') + x.Class.Name + ":" + x.SeatNo.ToString().PadLeft(3, '0');
+
+            }
+
+            if (!(y.RefClassID == "" || y.RefClassID == null))
+            {
+                if (y.Class.DisplayOrder == "" || y.Class.DisplayOrder == null)
+                    yy = y.Class.GradeYear.ToString().PadLeft(3, '0') + ":" + y.Class.DisplayOrder.PadLeft(3, 'Z') + y.Class.Name + ":" + y.SeatNo.ToString().PadLeft(3, '0');
+                else
+                    yy = y.Class.GradeYear.ToString().PadLeft(3, '0') + ":" + y.Class.DisplayOrder.PadLeft(3, '0') + y.Class.Name + ":" + y.SeatNo.ToString().PadLeft(3, '0');
+
+            }
+
+            return xx.CompareTo(yy);
+        }
     }
 }
