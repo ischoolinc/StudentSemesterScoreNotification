@@ -194,6 +194,12 @@ namespace StudentSemesterScoreNotification
             dt.Columns.Add("班級");
             dt.Columns.Add("座號");
             dt.Columns.Add("學號");
+            dt.Columns.Add("國籍一");
+            dt.Columns.Add("國籍一護照名");
+            dt.Columns.Add("國籍二");
+            dt.Columns.Add("國籍二護照名");
+            dt.Columns.Add("國籍一英文");            
+            dt.Columns.Add("國籍二英文");           
             dt.Columns.Add("大功");
             dt.Columns.Add("小功");
             dt.Columns.Add("嘉獎");
@@ -376,11 +382,19 @@ namespace StudentSemesterScoreNotification
             }
 
             //基本資料
+            QueryHelper qh1 = new QueryHelper();
+            //國籍名稱中英文對照表
+            //string strSQL2 = "select* from $ischool.mapping.nationality ";//(name中文,eng_name英文)
+            
             foreach (StudentRecord student in _students)
             {
                 DataRow row = dt.NewRow();
+                
                 ClassRecord myClass = classDic.ContainsKey(student.RefClassID) ? classDic[student.RefClassID] : new ClassRecord();
                 TeacherRecord myTeacher = myClass.Teacher != null ? myClass.Teacher : new TeacherRecord();
+                //護照資料
+                string strSQL1 = "select nationality1, passport_name1, nat1.eng_name as nat_eng1, nationality2, passport_name2, nat2.eng_name as nat_eng2, nationality3, passport_name3, nat3.eng_name as nat_eng3 from student_info_ext  as stud_info left outer join $ischool.mapping.nationality as nat1 on nat1.name = stud_info.nationality1 left outer join $ischool.mapping.nationality as nat2 on nat2.name = stud_info.nationality2 left outer join $ischool.mapping.nationality as nat3 on nat3.name = stud_info.nationality3 WHERE ref_student_id=" + student.ID;
+                DataTable student_info_ext = qh1.Select(strSQL1);               
 
                 row["列印日期"] = printDateTime;
                 row["學校名稱"] = schoolName;
@@ -393,7 +407,24 @@ namespace StudentSemesterScoreNotification
                 row["班導師"] = myTeacher.Name + "";
                 row["座號"] = student.SeatNo + "";
                 row["學號"] = student.StudentNumber;
-
+                if (student_info_ext.Rows.Count>0)
+                {
+                    row["國籍一"] =student_info_ext.Rows[0]["nationality1"] ;
+                    row["國籍一護照名"] = student_info_ext.Rows[0]["passport_name1"];
+                    row["國籍二"] = student_info_ext.Rows[0]["nationality2"]; 
+                    row["國籍二護照名"] = student_info_ext.Rows[0]["passport_name2"];
+                    row["國籍一英文"] = student_info_ext.Rows[0]["nat_eng1"];
+                    row["國籍二英文"] = student_info_ext.Rows[0]["nat_eng2"];
+                }
+                else
+                {
+                    row["國籍一"] = "";
+                    row["國籍一護照名"] = "";
+                    row["國籍二"] = "";
+                    row["國籍二護照名"] = "";
+                    row["國籍一英文"] = "";
+                    row["國籍二英文"] = "";
+                }
                 row["校長"] = 校長;
                 row["教務主任"] = 教務主任;
 
